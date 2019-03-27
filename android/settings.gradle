@@ -1,4 +1,6 @@
 rootProject.name = 'ModelApp'
+include ':react-native-sensors'
+project(':react-native-sensors').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sensors/android')
 include ':react-native-gl-model-view'
 project(':react-native-gl-model-view').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gl-model-view/android')
 

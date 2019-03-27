@@ -1,8 +1,20 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
 import ModelView from 'react-native-gl-model-view';
 import { Animated, Easing } from 'react-native';
 const AnimatedModelView = Animated.createAnimatedComponent(ModelView);
+
+import {
+  setUpdateIntervalForType,
+  SensorTypes,
+  accelerometer
+} from "react-native-sensors";
+
+
+function accelerometerData() {
+  setUpdateIntervalForType(SensorTypes.accelerometer, 150);
+
+  return accelerometer
+}
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -11,25 +23,41 @@ export default class App extends Component<Props> {
     super(props);
 
     this.state = {
-      zoom: new Animated.Value(0),
+      x:new Animated.Value(2),
+      y:0,
+      zoom: new Animated.Value(-2),
     };
     Object.keys(this.state).forEach(key =>
       this.state[key] instanceof Animated.Value &&
       this.state[key].__makeNative()
     );
+     this.getAccelerometerData();
+  }
+
+  async getAccelerometerData() {
+    const accelerometer = await accelerometerData();
+
+    accelerometer.subscribe(({ x, y, z }) => {
+      console.log(new Animated.Value(x));
+      this.setState({ x:new Animated.Value(x)});
+      this.setState({ y:new Animated.Value(y)});
+    });
   }
 
   render() {
     return (
-      <ModelView
-        model="model.obj"
-        texture="texture.png"
+      <AnimatedModelView
+        model="robot.obj"
+        texture="bucket.png"
 
-        scale={0.01}
+        scale={1}
 
-        rotateZ={270}
+        rotateZ={180}
+        rotateY={90}
         animate={true}
-        translateZ={this.state.zoom}
+        translateZ={-5}
+        tramslateX={this.state.x*10}
+        tramslateY={this.state.y*10}
         style={{flex: 1}}
       />
     );
@@ -44,12 +72,3 @@ export default class App extends Component<Props> {
     }).start();
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  }
-});
